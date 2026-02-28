@@ -48,12 +48,10 @@ function CreateContract() {
   return (
     <div className="p-8 max-w-2xl mx-auto">
       
-      {/* Heading */}
       <h1 className="text-2xl font-bold mb-6">
         Create Contract
       </h1>
 
-      {/* Select Blueprint */}
       <select
         value={selectedBlueprint}
         onChange={(e) => setSelectedBlueprint(e.target.value)}
@@ -68,7 +66,6 @@ function CreateContract() {
         ))}
       </select>
 
-      {/* Generate Button */}
       <button
         onClick={handleGenerateContract}
         className="bg-blue-600 text-white px-6 py-2 rounded w-full"
