@@ -1,4 +1,3 @@
-
 import { useState, useContext } from "react";
 import { BlueprintContext } from "../context/BlueprintContext";
 import FieldEditor from "../components/blueprint/FieldEditor";
@@ -8,47 +7,69 @@ import { v4 as uuid } from "uuid";
 function BlueprintBuilder() {
   const { dispatch } = useContext(BlueprintContext);
 
-  const [name, setName] = useState("");
+  const [blueprintName, setBlueprintName] = useState("");
   const [fields, setFields] = useState([]);
 
-  const addField = () => {
-    setFields([
-      ...fields,
-      { id: uuid(), type: "text", label: "", x: 50, y: 50 },
-    ]);
+  const handleAddField = () => {
+    const newField = {
+      id: uuid(),
+      type: "text",
+      label: "",
+      x: 50,
+      y: 50,
+    };
+
+    setFields([...fields, newField]);
   };
 
   const updateField = (id, key, value) => {
-    setFields(
-      fields.map((field) =>
-        field.id === id ? { ...field, [key]: value } : field
-      )
+    const updatedFields = fields.map((field) =>
+      field.id === id ? { ...field, [key]: value } : field
     );
+
+    setFields(updatedFields);
   };
 
-  const saveBlueprint = () => {
+  const handleSaveBlueprint = () => {
+    if (!blueprintName) {
+      alert("Please enter blueprint name");
+      return;
+    }
+
+    const newBlueprint = {
+      id: uuid(),
+      name: blueprintName,
+      fields: fields,
+    };
+
     dispatch({
       type: "ADD_BLUEPRINT",
-      payload: { id: uuid(), name, fields },
+      payload: newBlueprint,
     });
-    alert("Blueprint Saved!");
+
+    alert("Blueprint Saved Successfully!");
+
+    setBlueprintName("");
+    setFields([]);
   };
 
   return (
-    <div className="p-8">
-      <h1 className="text-xl font-bold mb-4">
+    <div className="p-8 max-w-4xl mx-auto">
+      <h1 className="text-2xl font-bold mb-6">
         Blueprint Builder
       </h1>
 
       <input
-        className="border p-2 w-full mb-4"
+        type="text"
         placeholder="Blueprint Name"
-        onChange={(e) => setName(e.target.value)}
+        value={blueprintName}
+        onChange={(e) => setBlueprintName(e.target.value)}
+        className="border p-3 w-full mb-4 rounded"
       />
 
       <button
-        onClick={addField}
-        className="bg-blue-600 text-white px-4 py-2 mb-4"
+        onClick={handleAddField}
+        className="bg-blue-600 text-white px-4 py-2 rounded mb-6"
       >
         Add Field
       </button>
@@ -61,14 +82,22 @@ function BlueprintBuilder() {
         />
       ))}
 
-      <BlueprintCanvas fields={fields} />
+      {fields.length > 0 && (
+        <>
+          <h2 className="text-lg font-semibold mt-6 mb-2">
+            Blueprint Preview
+          </h2>
+          <BlueprintCanvas fields={fields} />
+        </>
+      )}
 
       <button
-        onClick={saveBlueprint}
-        className="bg-green-600 text-white px-6 py-2 mt-4"
+        onClick={handleSaveBlueprint}
+        className="bg-green-600 text-white px-6 py-2 rounded mt-6"
       >
         Save Blueprint
       </button>
+
     </div>
   );
 }
