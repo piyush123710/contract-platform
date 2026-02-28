@@ -10,42 +10,57 @@ function CreateContract() {
   const { blueprints } = useContext(BlueprintContext);
   const { dispatch } = useContext(ContractContext);
   const navigate = useNavigate();
-  const [selected, setSelected] = useState("");
 
-  const createContract = () => {
+  const [selectedBlueprint, setSelectedBlueprint] = useState("");
+
+  const handleGenerateContract = () => {
+    if (!selectedBlueprint) {
+      alert("Please select a blueprint");
+      return;
+    }
+
     const blueprint = blueprints.find(
-      (b) => b.id === selected
+      (bp) => bp.id === selectedBlueprint
     );
 
     if (!blueprint) return;
 
+    const newContract = {
+      id: uuid(),
+      name: blueprint.name,
+      blueprintName: blueprint.name,
+      fields: blueprint.fields,
+      values: {},
+      status: STATUS.CREATED,
+      createdAt: new Date().toISOString(),
+    };
+
     dispatch({
       type: "ADD_CONTRACT",
-      payload: {
-        id: uuid(),
-        name: blueprint.name,
-        blueprintName: blueprint.name,
-        fields: blueprint.fields,
-        values: {},
-        status: STATUS.CREATED,
-        createdAt: new Date().toISOString(),
-      },
+      payload: newContract,
     });
+
+    alert("Contract Created Successfully!");
 
     navigate("/");
   };
 
   return (
-    <div className="p-8">
-      <h1 className="text-xl font-bold mb-4">
+    <div className="p-8 max-w-2xl mx-auto">
+      
+      {/* Heading */}
+      <h1 className="text-2xl font-bold mb-6">
         Create Contract
       </h1>
 
+      {/* Select Blueprint */}
       <select
-        className="border p-2 w-full mb-4"
-        onChange={(e) => setSelected(e.target.value)}
+        value={selectedBlueprint}
+        onChange={(e) => setSelectedBlueprint(e.target.value)}
+        className="border p-3 w-full mb-6 rounded"
       >
-        <option>Select Blueprint</option>
+        <option value="">Select Blueprint</option>
+
         {blueprints.map((bp) => (
           <option key={bp.id} value={bp.id}>
             {bp.name}
@@ -53,12 +68,14 @@ function CreateContract() {
         ))}
       </select>
 
+      {/* Generate Button */}
       <button
-        onClick={createContract}
-        className="bg-blue-600 text-white px-4 py-2"
+        onClick={handleGenerateContract}
+        className="bg-blue-600 text-white px-6 py-2 rounded w-full"
       >
         Generate Contract
       </button>
+
     </div>
   );
 }
